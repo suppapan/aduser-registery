@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -41,10 +42,10 @@ const formSchema = z.object({
   preferredPlatforms: z.array(z.string()).optional(),
   preferredContact: z.string(),
   
-  // Terms
-  termsAccepted: z.literal(true, {
-    errorMap: () => ({ message: "You must accept the terms and conditions." }),
-  }),
+  // Terms - Modified to accept boolean for initial state, but validate for true on submit
+  termsAccepted: z.boolean().refine(val => val === true, {
+    message: "You must accept the terms and conditions."
+  })
 });
 
 type FormValues = z.infer<typeof formSchema>;
