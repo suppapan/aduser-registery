@@ -23,22 +23,43 @@ The only requirement is having Node.js & npm installed - [install with nvm](http
 Follow these steps:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# ADUser Registry
+
+## Development with Docker
+
+### First Time Setup
+```bash
+# Step 1: Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Step 2: Navigate to the project directory
 cd <YOUR_PROJECT_NAME>
 
+# Step 3: Build and start the container
+docker-compose up --build
+```
 
+### Regular Development
+```bash
+# Start the container
+docker-compose up
 
-# Step 3: Install the necessary dependencies.
-# Build the Docker image
-docker build -t aduser-registry .
+# Rebuild and start (when dependencies change)
+docker-compose up --build
 
-# Run the container
-docker run -p 8080:80 aduser-registry
+# Stop the container
+docker-compose down
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# View logs
+docker-compose logs -f
+```
+
+### Development without Docker
+```bash
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
 ```
 
