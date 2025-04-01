@@ -29,7 +29,15 @@ def create_ad_user():
             name=f"{data['firstName']} {data['lastName']}",
             firstname=data['firstName'],
             lastname=data['lastName'],
+            username=data['username'],
+            password=data['password'],
             email=data['email'],
+            ou=data['ou'],
+            telephone=data['telephone'],
+            zipcode=data['zipCode'],
+            description=data['description'],
+            department=data['department'],
+            title=data['jobTitle'],
             # Add other attributes based on your AD schema
         )
         

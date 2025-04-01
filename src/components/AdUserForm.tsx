@@ -25,14 +25,26 @@ const formSchema = z.object({
   // Personal Information
   firstName: z.string().min(2, "First name must be at least 2 characters."),
   lastName: z.string().min(2, "Last name must be at least 2 characters."),
+  fullName: z.string().min(4, "Full name must be at least 4 characters."),
+  username: z.string().min(3, "Username must be at least 3 characters."),
+  password: z.string().min(8, "Password must be at least 8 characters."),
   email: z.string().email("Please enter a valid email address."),
-  phone: z.string().min(10, "Please enter a valid phone number.").optional(),
+  telephone: z.string().min(10, "Please enter a valid phone number.").optional(),
+  zipCode: z.string().min(5, "Please enter a valid zip code.").optional(),
+  
+  // Job Information
+  jobTitle: z.string().min(2, "Job title must be at least 2 characters.").optional(),
+  department: z.string().min(2, "Department must be at least 2 characters.").optional(),
+  description: z.string().optional(),
   
   // Company Details
   companyName: z.string().min(2, "Company name must be at least 2 characters."),
   website: z.string().url("Please enter a valid URL.").optional(),
   industry: z.string().min(1, "Please select an industry."),
   companySize: z.string(),
+  
+  // Organizational Unit
+  ou: z.string().min(1, "Please select an organizational unit."),
   
   // Ad Account Information
   budget: z.string().min(1, "Please enter your monthly budget."),
@@ -59,8 +71,16 @@ const AdUserForm = () => {
     defaultValues: {
       firstName: "",
       lastName: "",
+      fullName: "",
+      username: "",
+      password: "",
       email: "",
-      phone: "",
+      telephone: "",
+      zipCode: "",
+      jobTitle: "",
+      department: "",
+      description: "",
+      ou: "",
       companyName: "",
       website: "",
       industry: "",
@@ -71,6 +91,15 @@ const AdUserForm = () => {
       termsAccepted: false,
     },
   });
+
+  // Generate fullName when firstName or lastName changes
+  React.useEffect(() => {
+    const firstName = form.watch("firstName");
+    const lastName = form.watch("lastName");
+    if (firstName && lastName) {
+      form.setValue("fullName", `${firstName} ${lastName}`);
+    }
+  }, [form.watch("firstName"), form.watch("lastName")]);
 
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
@@ -145,6 +174,48 @@ const AdUserForm = () => {
             
             <FormField
               control={form.control}
+              name="fullName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="John Doe" {...field} readOnly />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="johndoe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password *</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="********" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
@@ -159,12 +230,76 @@ const AdUserForm = () => {
             
             <FormField
               control={form.control}
-              name="phone"
+              name="telephone"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Phone Number</FormLabel>
                   <FormControl>
                     <Input placeholder="+1 (555) 123-4567" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="zipCode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Zip Code</FormLabel>
+                  <FormControl>
+                    <Input placeholder="12345" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </FormSection>
+        
+        <FormSection title="Job Information">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              control={form.control}
+              name="jobTitle"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Job Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Marketing Manager" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="department"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Department</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Marketing" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem className="col-span-2">
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Brief description about this user" 
+                      rows={3}
+                      {...field} 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -198,6 +333,31 @@ const AdUserForm = () => {
                   <FormControl>
                     <Input placeholder="https://www.example.com" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="ou"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Organizational Unit *</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select an organizational unit" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="OU=Marketing,DC=example,DC=com">Marketing</SelectItem>
+                      <SelectItem value="OU=Sales,DC=example,DC=com">Sales</SelectItem>
+                      <SelectItem value="OU=Engineering,DC=example,DC=com">Engineering</SelectItem>
+                      <SelectItem value="OU=Finance,DC=example,DC=com">Finance</SelectItem>
+                      <SelectItem value="OU=HR,DC=example,DC=com">Human Resources</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
