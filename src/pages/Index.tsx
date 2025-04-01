@@ -3,6 +3,9 @@ import React from "react";
 import PageHeader from "@/components/PageHeader";
 import AdUserForm from "@/components/AdUserForm";
 import BackendInfo from "@/components/BackendInfo";
+import { Button } from "@/components/ui/button";
+import { Users, Upload, CheckCircle, FolderTree } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
@@ -18,6 +21,9 @@ const Index = () => {
             </div>
             <nav>
               <ul className="flex space-x-6">
+                <li>
+                  <Link to="/admin" className="text-gray-600 hover:text-brand-600">Admin Dashboard</Link>
+                </li>
                 <li>
                   <a href="#" className="text-gray-600 hover:text-brand-600">Help</a>
                 </li>
