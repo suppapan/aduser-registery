@@ -1,6 +1,5 @@
-
 import React, { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Form, 
   FormControl, 
@@ -18,6 +17,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import FormSection from "./FormSection";
+
+const API_URL = "http://localhost:5000";
 
 const formSchema = z.object({
   // Personal Information
@@ -74,10 +75,21 @@ const AdUserForm = () => {
     setIsSubmitting(true);
     
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const response = await fetch(`${API_URL}/api/create-ad-user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
       
-      console.log("Form submitted:", data);
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to create user');
+      }
+      
+      console.log("API Response:", result);
       
       toast({
         title: "Success!",
@@ -86,9 +98,10 @@ const AdUserForm = () => {
       
       form.reset();
     } catch (error) {
+      console.error("Error creating user:", error);
       toast({
         title: "Error",
-        description: "There was a problem creating your account. Please try again.",
+        description: error instanceof Error ? error.message : "There was a problem creating your account. Please try again.",
         variant: "destructive",
       });
     } finally {

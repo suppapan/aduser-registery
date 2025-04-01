@@ -2,6 +2,7 @@
 import React from "react";
 import PageHeader from "@/components/PageHeader";
 import AdUserForm from "@/components/AdUserForm";
+import BackendInfo from "@/components/BackendInfo";
 
 const Index = () => {
   return (
@@ -31,9 +32,10 @@ const Index = () => {
         <main>
           <PageHeader 
             title="Create Advertising User Account" 
-            description="Complete the form below to register for a new advertising account. Fields marked with * are required."
+            description="Complete the form below to register for a new advertising account. Form data will be sent to a Flask backend with PyAD integration."
           />
           
+          <BackendInfo />
           <AdUserForm />
         </main>
         
