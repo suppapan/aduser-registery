@@ -6,6 +6,7 @@ import CsvImport from "@/components/admin/CsvImport";
 import OuManagement from "@/components/admin/OuManagement";
 import AuthTest from "@/components/admin/AuthTest";
 import AdminNavBar from "@/components/admin/AdminNavBar";
+import AdminLogin from "@/components/admin/AdminLogin";
 
 const Admin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
