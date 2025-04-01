@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Check } from "lucide-react";
+import { Upload, Check, Download } from "lucide-react";
 import { 
   Table,
   TableBody,
@@ -12,17 +12,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const API_URL = "http://localhost:5000";
 
-// Sample OUs for selection
+// Sample OUs for the template
 const organizationalUnits = [
   "OU=Marketing,DC=example,DC=com",
   "OU=Sales,DC=example,DC=com",
@@ -51,7 +44,6 @@ const CsvImport = () => {
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
   const [users, setUsers] = useState<CsvUser[]>([]);
-  const [targetOu, setTargetOu] = useState<string>(organizationalUnits[0]);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,11 +83,6 @@ const CsvImport = () => {
               user.fullname = `${user.firstname} ${user.lastname}`;
             }
             
-            // Set OU to selected OU if not provided
-            if (!user.ou) {
-              user.ou = targetOu;
-            }
-            
             parsedUsers.push(user as CsvUser);
           }
         }
@@ -110,10 +97,9 @@ const CsvImport = () => {
   const handleImport = async () => {
     setIsLoading(true);
     try {
-      // For each user in the parsed CSV, set their OU to the selected OU if override option is selected
+      // Use the OUs from the CSV data
       const usersToImport = users.map(user => ({
         ...user,
-        ou: targetOu, // Override with selected OU
       }));
       
       // In a real app, this would call your Flask backend
@@ -142,7 +128,7 @@ const CsvImport = () => {
       
       toast({
         title: "Users Imported Successfully",
-        description: `${users.length} users were imported to ${targetOu}`,
+        description: `${users.length} users were imported with their respective OUs`,
       });
       
       // Clear form
@@ -160,36 +146,42 @@ const CsvImport = () => {
     }
   };
 
+  const downloadTemplate = () => {
+    const headers = "username,password,firstname,lastname,ou,email,zipcode,description,telephone,jobtitle,department\n";
+    const sampleRow = "jdoe,Password123!,John,Doe,OU=IT\\,DC=example\\,DC=com,jdoe@example.com,12345,IT Specialist,555-1234,Systems Admin,IT\n";
+    const sampleRow2 = "asmith,SecurePass456!,Alice,Smith,OU=Marketing\\,DC=example\\,DC=com,asmith@example.com,67890,Marketing Specialist,555-5678,Marketing Manager,Marketing";
+    
+    const csvContent = headers + sampleRow + sampleRow2;
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'ad_users_template.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm">
       <h2 className="text-xl font-semibold mb-4">Import Users from CSV</h2>
       <p className="mb-6 text-gray-600">
         Upload a CSV file containing user information to bulk create AD users.
-        The CSV should contain columns for: username, password, firstname, lastname, email, etc.
+        The CSV should contain columns for: username, password, firstname, lastname, ou, email, etc.
       </p>
       
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Target Organizational Unit
-        </label>
-        <Select 
-          value={targetOu} 
-          onValueChange={setTargetOu}
+        <Button 
+          variant="outline" 
+          onClick={downloadTemplate}
+          className="w-full mb-4"
         >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select an OU" />
-          </SelectTrigger>
-          <SelectContent>
-            {organizationalUnits.map((ou) => (
-              <SelectItem key={ou} value={ou}>
-                {ou}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      
-      <div className="mb-6">
+          <Download className="mr-2 h-4 w-4" />
+          Download CSV Template
+        </Button>
+        
         <label className="block text-sm font-medium text-gray-700 mb-1">
           CSV File
         </label>
@@ -199,7 +191,7 @@ const CsvImport = () => {
           onChange={handleFileChange}
         />
         <p className="text-xs text-gray-500 mt-1">
-          File should be a CSV with headers matching required AD attributes
+          File should be a CSV with headers matching required AD attributes including the OU
         </p>
       </div>
       
@@ -213,8 +205,8 @@ const CsvImport = () => {
                   <TableHead>Username</TableHead>
                   <TableHead>Full Name</TableHead>
                   <TableHead>Email</TableHead>
+                  <TableHead>OU</TableHead>
                   <TableHead>Department</TableHead>
-                  <TableHead>Job Title</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -223,8 +215,8 @@ const CsvImport = () => {
                     <TableCell>{user.username}</TableCell>
                     <TableCell>{user.fullname}</TableCell>
                     <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.ou}</TableCell>
                     <TableCell>{user.department}</TableCell>
-                    <TableCell>{user.jobtitle}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
