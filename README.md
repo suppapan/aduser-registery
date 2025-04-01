@@ -29,8 +29,14 @@ git clone <YOUR_GIT_URL>
 # Step 2: Navigate to the project directory.
 cd <YOUR_PROJECT_NAME>
 
+
+
 # Step 3: Install the necessary dependencies.
-npm i
+# Build the Docker image
+docker build -t aduser-registry .
+
+# Run the container
+docker run -p 8080:80 aduser-registry
 
 # Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
